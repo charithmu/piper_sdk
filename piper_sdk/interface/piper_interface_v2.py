@@ -723,6 +723,9 @@ class C_PiperInterface_V2():
     def __GetCurrentTime(self):
         return time.time_ns() / 1e9
     
+    def GetCanBus(self):
+        return self.__arm_can
+    
     def GetCanName(self):
         return self.__can_channel_name
 
