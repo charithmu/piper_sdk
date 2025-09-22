@@ -1294,16 +1294,29 @@ class C_PiperInterface():
         '''
         with self.__arm_joint_msgs_mtx:
             if(msg.type_ == ArmMsgType.PiperMsgJointFeedBack_12):
+                joint1 = self.__CalJointSDKLimit(msg.arm_joint_feedback.joint_1, "j1")
+                joint2 = self.__CalJointSDKLimit(msg.arm_joint_feedback.joint_2, "j2")
+                # 300 degree * 1000
+                if abs(joint1) > 3000000 or abs(joint2) > 3000000:
+                    return
                 self.__fps_counter.increment("ArmJoint_12")
                 self.__arm_joint_msgs.time_stamp = msg.time_stamp
                 self.__arm_joint_msgs.joint_state.joint_1 = self.__CalJointSDKLimit(msg.arm_joint_feedback.joint_1, "j1")
                 self.__arm_joint_msgs.joint_state.joint_2 = self.__CalJointSDKLimit(msg.arm_joint_feedback.joint_2, "j2")
             elif(msg.type_ == ArmMsgType.PiperMsgJointFeedBack_34):
+                joint3 = self.__CalJointSDKLimit(msg.arm_joint_feedback.joint_3, "j3")
+                joint4 = self.__CalJointSDKLimit(msg.arm_joint_feedback.joint_4, "j4")
+                if abs(joint3) > 3000000 or abs(joint4) > 3000000:
+                    return
                 self.__fps_counter.increment("ArmJoint_34")
                 self.__arm_joint_msgs.time_stamp = msg.time_stamp
                 self.__arm_joint_msgs.joint_state.joint_3 = self.__CalJointSDKLimit(msg.arm_joint_feedback.joint_3, "j3")
                 self.__arm_joint_msgs.joint_state.joint_4 = self.__CalJointSDKLimit(msg.arm_joint_feedback.joint_4, "j4")
             elif(msg.type_ == ArmMsgType.PiperMsgJointFeedBack_56):
+                joint5 = self.__CalJointSDKLimit(msg.arm_joint_feedback.joint_5, "j5")
+                joint6 = self.__CalJointSDKLimit(msg.arm_joint_feedback.joint_6, "j6")
+                if abs(joint5) > 3000000 or abs(joint6) > 3000000:
+                    return
                 self.__fps_counter.increment("ArmJoint_56")
                 self.__arm_joint_msgs.time_stamp = msg.time_stamp
                 self.__arm_joint_msgs.joint_state.joint_5 = self.__CalJointSDKLimit(msg.arm_joint_feedback.joint_5, "j5")
@@ -1323,6 +1336,10 @@ class C_PiperInterface():
         '''
         with self.__arm_gripper_msgs_mtx:
             if(msg.type_ == ArmMsgType.PiperMsgGripperFeedBack):
+                gripper_val = self.__CalGripperSDKLimit(msg.gripper_feedback.grippers_angle)
+                # 150mm * 1000
+                if abs(gripper_val) > 150000:
+                    return
                 self.__fps_counter.increment("ArmGripper")
                 self.__arm_gripper_msgs.time_stamp = msg.time_stamp
                 self.__arm_gripper_msgs.gripper_state.grippers_angle = self.__CalGripperSDKLimit(msg.gripper_feedback.grippers_angle)
