@@ -1265,16 +1265,28 @@ class C_PiperInterface():
         '''
         with self.__arm_end_pose_mtx:
             if(msg.type_ == ArmMsgType.PiperMsgEndPoseFeedback_1):
+                # 1m * 1000 * 1000
+                if abs(msg.arm_end_pose.X_axis) > 1e6 or abs(msg.arm_end_pose.Y_axis) > 1e6:
+                    return
                 self.__fps_counter.increment("ArmEndPose_XY")
                 self.__arm_end_pose.time_stamp = msg.time_stamp
                 self.__arm_end_pose.end_pose.X_axis = msg.arm_end_pose.X_axis
                 self.__arm_end_pose.end_pose.Y_axis = msg.arm_end_pose.Y_axis
             elif(msg.type_ == ArmMsgType.PiperMsgEndPoseFeedback_2):
+                # 1m * 1000 * 1000
+                if abs(msg.arm_end_pose.Z_axis) > 1e6:
+                    return
+                # 361 * 1000
+                if abs(msg.arm_end_pose.RX_axis) > 361000:
+                    return
                 self.__fps_counter.increment("ArmEndPose_ZRX")
                 self.__arm_end_pose.time_stamp = msg.time_stamp
                 self.__arm_end_pose.end_pose.Z_axis = msg.arm_end_pose.Z_axis
                 self.__arm_end_pose.end_pose.RX_axis = msg.arm_end_pose.RX_axis
             elif(msg.type_ == ArmMsgType.PiperMsgEndPoseFeedback_3):
+                # 361 * 1000
+                if abs(msg.arm_end_pose.RY_axis) > 361000 or abs(msg.arm_end_pose.RZ_axis) > 361000:
+                    return
                 self.__fps_counter.increment("ArmEndPose_RYRZ")
                 self.__arm_end_pose.time_stamp = msg.time_stamp
                 self.__arm_end_pose.end_pose.RY_axis = msg.arm_end_pose.RY_axis
