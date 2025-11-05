@@ -16,7 +16,7 @@ for arg in "$@"; do
     fi
 done
 
-# Step 1: 打印 USB_PORTS 映射，同时检测是否存在重复目标名
+# Step 1: Print USB_PORTS mapping and detect duplicate target names
 echo "🔧 Checking USB_PORTS configuration:"
 declare -A TARGET_NAMES_COUNT
 LINE_NUM=0
@@ -26,7 +26,7 @@ for k in "${!USB_PORTS[@]}"; do
     LINE_NUM=$((LINE_NUM + 1))
     IFS=':' read -r name bitrate <<< "${USB_PORTS[$k]}"
     
-    # 检查是否重复
+    # Check for duplicates
     if [[ -n "${TARGET_NAMES_COUNT[$name]}" ]]; then
         echo "→ [$LINE_NUM] \"$k\"=\"${USB_PORTS[$k]}\"  ❌ Duplicate target CAN name: '$name'"
         HAS_DUPLICATE=true
@@ -70,13 +70,13 @@ fi
 SUCCESS_COUNT=0  # Number of CAN interfaces successfully processed
 FAILED_COUNT=0   # Expected number of interfaces that failed or were not processed
 
-# Copy a list of USB_PORTS keys and mark each one for success
+# Create a status tracking array for USB_PORTS and mark each as pending
 declare -A USB_PORT_STATUS
 for k in "${!USB_PORTS[@]}"; do
     USB_PORT_STATUS["$k"]="pending"
 done
 # Handle multiple CAN modules
-# Iterate over all CAN interfaces
+# Iterate through all CAN interfaces
 SYS_INTERFACE=$(ip -br link show type can | awk '{print $1}')
 
 echo -e "\n🔍 [INFO]: The following CAN interfaces were detected in the system:"
@@ -131,7 +131,7 @@ for iface in $SYS_INTERFACE; do
             #     echo "[WARN]: Interface '$TARGET_NAME' already exists. Deleting to allow renaming."
             #     sudo ip link delete "$TARGET_NAME"
             # fi
-            # If the interface is not active or the bit rate is different, set
+            # If the interface is not active or the bitrate is different, configure it
             if [ "$IS_LINK_UP" = "yes" ]; then
                 echo "[INFO]: Interface '$iface' is activated, but the bitrate $CURRENT_BITRATE does not match the set $TARGET_BITRATE."
             else
@@ -168,7 +168,7 @@ for iface in $SYS_INTERFACE; do
     echo "-----------------------------------------------------------------"
 done
 
-# Calculation failed USB port
+# Calculate failed USB ports
 for k in "${!USB_PORT_STATUS[@]}"; do
     if [ "${USB_PORT_STATUS[$k]}" != "success" ]; then
         echo "❌ Expected CAN interface on USB port '$k' was not found or not activated."
@@ -176,7 +176,7 @@ for k in "${!USB_PORT_STATUS[@]}"; do
     fi
 done
 
-# Final Tips
+# Final summary
 if [ "$SUCCESS_COUNT" -gt 0 ]; then
     echo "[RESULT]: ✅ $SUCCESS_COUNT expected CAN interfaces processed successfully."
 else
